@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carnicería Don Chuy — Cortes frescos a domicilio</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --blanco:#ffffff;
+  --fondo:#f5f0eb;
+  --fondo2:#ece5dc;
+  --negro:#1a0f0a;
+  --negro2:#2d1a12;
+  --verde:#b91c1c;
+  --verde2:#dc2626;
+  --verde-pale:#fde8e8;
+  --rojo:#7f1d1d;
+  --amarillo:#d97706;
+  --gris:#8a7a72;
+  --gris2:#d4c8be;
+  --fd:'Oswald',sans-serif;
+  --fb:'Manrope',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fb);background:var(--fondo);color:var(--negro);overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--fondo);}
+::-webkit-scrollbar-thumb{background:var(--verde);}
+
+/* NAV */
+nav{
+  background:var(--negro);
+  height:64px;padding:0 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo-leaf{
+  width:34px;height:34px;background:var(--verde);border-radius:50% 0 50% 50%;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  transform:rotate(-45deg);
+}
+.nav-logo-leaf span{transform:rotate(45deg);display:block;}
+.nav-logo-text{font-family:var(--fd);font-size:20px;color:#fff;font-weight:700;letter-spacing:-.3px;}
+.nav-logo-text em{color:var(--verde2);font-style:normal;}
+.nav-mid{display:flex;gap:0;}
+.nav-mid a{
+  padding:8px 16px;font-size:12px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s;
+}
+.nav-mid a:hover{color:#fff;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-search-wrap{
+  display:flex;align-items:center;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);border-radius:24px;overflow:hidden;
+  padding:6px 14px;gap:8px;
+}
+.nav-search-wrap input{background:none;border:none;outline:none;color:#fff;font-size:13px;font-family:var(--fb);width:150px;}
+.nav-search-wrap input::placeholder{color:rgba(255,255,255,.3);}
+.nav-search-wrap svg{opacity:.4;flex-shrink:0;}
+.nav-admin-btn{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.5);width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;
+}
+.nav-admin-btn:hover{background:rgba(61,143,88,.3);border-color:var(--verde2);color:var(--verde2);}
+.cart-fab{
+  display:flex;align-items:center;gap:8px;background:var(--verde);color:#fff;
+  border:none;border-radius:24px;padding:8px 18px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:var(--fb);transition:background .2s;text-decoration:none;
+}
+.cart-fab:hover{background:var(--verde2);}
+.cn{background:#fff;color:var(--verde);border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;}
+.hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .3s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* MOB MENU */
+.mob-menu{
+  position:fixed;top:64px;left:0;right:0;bottom:0;
+  background:var(--negro);z-index:99;
+  display:none;flex-direction:column;padding:24px 20px;gap:4px;overflow-y:auto;
+}
+.mob-menu.open{display:flex;}
+.mob-menu a{
+  padding:14px 0;font-family:var(--fd);font-size:20px;font-weight:700;
+  color:rgba(255,255,255,.4);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.06);
+  transition:color .2s;
+}
+.mob-menu a:hover{color:var(--verde2);}
+
+/* HERO */
+.hero{
+  background:var(--negro);
+  display:grid;grid-template-columns:1fr 1fr;
+  min-height:88vh;position:relative;overflow:hidden;
+}
+.hero-left{
+  padding:80px 56px;display:flex;flex-direction:column;justify-content:center;
+  position:relative;z-index:2;
+}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(61,143,88,.2);border:1px solid rgba(61,143,88,.3);
+  border-radius:20px;padding:5px 14px;margin-bottom:28px;width:fit-content;
+}
+.hero-pill-dot{width:6px;height:6px;background:var(--verde2);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero-pill span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--verde2);}
+.hero-title{
+  font-family:var(--fd);font-size:clamp(52px,6.5vw,96px);
+  font-weight:800;line-height:.9;color:#fff;
+  margin-bottom:24px;letter-spacing:-1px;
+}
+.hero-title .accent{color:var(--verde2);}
+.hero-title .outline{-webkit-text-stroke:2px rgba(255,255,255,.3);color:transparent;}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.45);line-height:1.75;max-width:420px;margin-bottom:40px;font-weight:300;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-green{
+  background:var(--verde);color:#fff;padding:14px 30px;font-size:13px;font-weight:600;
+  letter-spacing:.06em;border-radius:8px;text-decoration:none;display:inline-block;
+  border:none;cursor:pointer;font-family:var(--fb);transition:background .2s,transform .15s;
+}
+.btn-green:hover{background:var(--verde2);transform:translateY(-2px);}
+.btn-outline-w{
+  background:transparent;color:rgba(255,255,255,.6);border:1.5px solid rgba(255,255,255,.15);
+  padding:13px 26px;font-size:13px;font-weight:500;border-radius:8px;
+  text-decoration:none;display:inline-block;transition:all .2s;
+}
+.btn-outline-w:hover{border-color:rgba(255,255,255,.4);color:#fff;}
+.hero-stats{display:flex;gap:28px;margin-top:44px;padding-top:32px;border-top:1px solid rgba(255,255,255,.08);}
+.hstat{text-align:center;}
+.hstat-val{font-family:var(--fd);font-size:28px;font-weight:800;color:var(--verde2);}
+.hstat-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:3px;}
+
+/* HERO RIGHT - MOSAIC */
+.hero-right{position:relative;overflow:hidden;}
+.hero-mosaic{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;height:100%;gap:3px;}
+.hm-cell{overflow:hidden;position:relative;}
+.hm-cell img{width:100%;height:100%;object-fit:cover;filter:brightness(.7);transition:filter .4s;}
+.hm-cell:hover img{filter:brightness(.9);}
+.hm-cell:first-child{grid-row:span 2;}
+.hm-label{
+  position:absolute;bottom:14px;left:14px;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
+  padding:4px 10px;border-radius:12px;
+  font-size:11px;font-weight:600;color:#fff;letter-spacing:.06em;
+}
+
+/* CATEGORÍAS */
+.cats-bar{background:var(--verde);padding:0;overflow-x:auto;}
+.cats-bar::-webkit-scrollbar{display:none;}
+.cats-row{display:flex;white-space:nowrap;}
+.cat-btn{
+  padding:15px 24px;font-size:12px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:rgba(255,255,255,.65);background:none;border:none;
+  cursor:pointer;font-family:var(--fb);display:flex;align-items:center;gap:8px;
+  border-right:1px solid rgba(255,255,255,.1);transition:all .2s;text-decoration:none;
+}
+.cat-btn:hover,.cat-btn.active{background:rgba(0,0,0,.15);color:#fff;}
+.cat-icon{font-size:16px;}
+
+/* OFERTA STRIP */
+.oferta-strip{
+  background:var(--rojo);padding:12px 40px;
+  display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;
+}
+.os-text{font-size:13px;font-weight:500;color:#fff;}
+.os-text strong{font-size:15px;}
+.os-pill{background:rgba(255,255,255,.2);color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);}
+.os-btn{background:#fff;color:var(--rojo);padding:6px 18px;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none;transition:opacity .2s;}
+.os-btn:hover{opacity:.85;}
+
+/* PRODUCTOS */
+.productos-sec{padding:72px 40px;}
+.prod-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;}
+.ph-left{}
+.ph-eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--verde);margin-bottom:6px;}
+.ph-title{font-family:var(--fd);font-size:36px;font-weight:800;color:var(--negro);}
+.ph-right{display:flex;gap:6px;flex-wrap:wrap;}
+.pf{
+  padding:6px 16px;border-radius:20px;border:1.5px solid var(--gris2);
+  background:var(--blanco);font-size:12px;font-weight:600;cursor:pointer;
+  color:var(--gris);font-family:var(--fb);transition:all .15s;
+}
+.pf:hover,.pf.active{background:var(--verde);border-color:var(--verde);color:#fff;}
+
+/* GRID */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
+.prod-card{
+  background:var(--blanco);border-radius:16px;overflow:hidden;
+  border:1.5px solid transparent;transition:all .2s;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.prod-card:hover{border-color:var(--verde);box-shadow:0 8px 24px rgba(42,107,63,.12);transform:translateY(-3px);}
+.prod-card:hover .pc-add-btn{opacity:1;transform:translateY(0);}
+.pc-img{
+  height:160px;position:relative;overflow:hidden;
+  background:var(--fondo);display:flex;align-items:center;justify-content:center;
+}
+.pc-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+.prod-card:hover .pc-img img{transform:scale(1.06);}
+.pc-badge{
+  position:absolute;top:10px;left:10px;border-radius:8px;
+  font-size:10px;font-weight:700;padding:3px 9px;letter-spacing:.05em;z-index:2;
+}
+.badge-oferta{background:var(--rojo);color:#fff;}
+.badge-nuevo{background:var(--verde);color:#fff;}
+.badge-popular{background:var(--amarillo);color:#fff;}
+.pc-add-btn{
+  position:absolute;bottom:10px;right:10px;z-index:2;
+  width:34px;height:34px;border-radius:50%;background:var(--verde);color:#fff;
+  border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(6px);transition:all .2s;
+}
+.pc-add-btn:hover{background:var(--verde2);}
+.pc-agotado-banner{
+  position:absolute;bottom:0;left:0;right:0;z-index:2;
+  background:rgba(26,26,22,.72);color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:7px 0;
+}
+.prod-card.agotado .pc-img img{filter:grayscale(60%);opacity:.7;}
+.prod-card.agotado{pointer-events:none;opacity:.85;}
+.pc-body{padding:12px 14px 14px;}
+.pc-cat{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--verde);margin-bottom:3px;}
+.pc-name{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--negro);margin-bottom:2px;line-height:1.2;}
+.pc-unit{font-size:11px;color:var(--gris);margin-bottom:10px;}
+.pc-footer{display:flex;align-items:center;justify-content:space-between;}
+.pc-price{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--verde);}
+.pc-price-old{font-size:12px;color:var(--gris);text-decoration:line-through;margin-left:4px;}
+.no-results{text-align:center;padding:48px;color:var(--gris);font-size:14px;}
+
+/* SERVICIOS */
+.servicios-sec{background:var(--negro);padding:72px 40px;}
+.serv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px;margin-top:48px;background:rgba(255,255,255,.05);}
+.serv-card{background:var(--negro);padding:32px 24px;border-top:2px solid transparent;transition:all .3s;}
+.serv-card:hover{border-top-color:var(--verde2);background:var(--negro2);}
+.serv-icon{font-size:32px;margin-bottom:16px;}
+.serv-name{font-family:var(--fd);font-size:18px;font-weight:700;color:#fff;margin-bottom:8px;}
+.serv-desc{font-size:13px;color:rgba(255,255,255,.4);line-height:1.65;}
+.serv-eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--verde2);margin-bottom:8px;}
+.serv-title{font-family:var(--fd);font-size:36px;font-weight:800;color:#fff;}
+
+/* FOOTER */
+footer{background:var(--negro2);padding:56px 40px 0;}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;}
+.foot-logo-wrap{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.foot-leaf{width:30px;height:30px;background:var(--verde);border-radius:50% 0 50% 50%;display:flex;align-items:center;justify-content:center;font-size:14px;transform:rotate(-45deg);}
+.foot-leaf span{transform:rotate(45deg);display:block;}
+.foot-brand{font-family:var(--fd);font-size:18px;font-weight:700;color:#fff;}
+.foot-brand em{color:var(--verde2);font-style:normal;}
+.foot-desc{font-size:13px;color:rgba(255,255,255,.3);line-height:1.75;max-width:220px;}
+.foot-col h4{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde2);margin-bottom:14px;}
+.foot-col a{display:block;font-size:13px;color:rgba(255,255,255,.35);text-decoration:none;margin-bottom:8px;transition:color .2s;}
+.foot-col a:hover{color:#fff;}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.06);padding:18px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.foot-bottom p{font-size:12px;color:rgba(255,255,255,.2);}
+.foot-soc{display:flex;gap:8px;}
+.fsoc{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.35);text-decoration:none;font-size:11px;font-weight:700;transition:all .2s;}
+.fsoc:hover{background:var(--verde);color:#fff;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--negro);color:#fff;border-radius:24px;padding:12px 22px;font-size:13px;font-weight:500;z-index:400;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.25);display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* CARRITO */
+.cart-overlay{position:fixed;inset:0;background:rgba(26,26,22,.6);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;}
+.cart-overlay.open{opacity:1;pointer-events:all;}
+.cart-drawer{position:fixed;top:0;right:-100%;width:400px;max-width:100vw;height:100vh;background:#fff;z-index:201;display:flex;flex-direction:column;transition:right .35s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 40px rgba(0,0,0,.12);}
+.cart-drawer.open{right:0;}
+.cart-head{background:var(--verde);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.cart-head-title{font-family:var(--fd);font-size:20px;font-weight:800;color:#fff;}
+.cart-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.cart-close:hover{background:rgba(255,255,255,.3);}
+.cart-items{flex:1;overflow-y:auto;padding:16px 20px;}
+.cart-empty{text-align:center;padding:48px 20px;color:var(--gris);}
+.cart-empty-icon{font-size:52px;margin-bottom:12px;}
+.ci{display:flex;gap:12px;padding:14px 0;border-bottom:1.5px solid var(--fondo2);}
+.ci-img{width:68px;height:68px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--fondo);}
+.ci-img img{width:100%;height:100%;object-fit:cover;}
+.ci-info{flex:1;}
+.ci-name{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--negro);margin-bottom:2px;}
+.ci-unit{font-size:11px;color:var(--gris);margin-bottom:8px;}
+.ci-ctrl{display:flex;align-items:center;justify-content:space-between;}
+.ci-qty{display:flex;align-items:center;border:1.5px solid var(--gris2);border-radius:20px;overflow:hidden;}
+.ci-qty button{width:28px;height:28px;background:#fff;border:none;cursor:pointer;font-size:15px;color:var(--negro);transition:background .15s;}
+.ci-qty button:hover{background:var(--verde-pale);}
+.ci-qty span{width:28px;text-align:center;font-size:13px;font-weight:600;color:var(--negro);}
+.ci-price{font-family:var(--fd);font-size:17px;font-weight:800;color:var(--verde);}
+.ci-rm{background:none;border:none;cursor:pointer;color:var(--gris);font-size:16px;padding:2px;transition:color .15s;}
+.ci-rm:hover{color:var(--rojo);}
+.cart-foot{padding:18px 20px;border-top:2px solid var(--fondo2);flex-shrink:0;background:#fff;}
+.cart-total-row{display:flex;justify-content:space-between;margin-bottom:14px;}
+.cart-total-label{font-size:14px;font-weight:500;color:var(--gris);}
+.cart-total-val{font-family:var(--fd);font-size:26px;font-weight:800;color:var(--negro);}
+.cart-btn-checkout{width:100%;background:var(--verde);color:#fff;border:none;border-radius:10px;padding:15px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:background .2s;}
+.cart-btn-checkout:hover{background:var(--verde2);}
+.cart-btn-cont{width:100%;background:none;border:1.5px solid var(--gris2);color:var(--gris);border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);margin-top:8px;transition:border-color .2s;}
+.cart-btn-cont:hover{border-color:var(--negro);color:var(--negro);}
+
+/* MODAL BASE */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(26,26,22,.75);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:#fff;width:100%;max-width:560px;max-height:92vh;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;transform:translateY(20px);transition:transform .3s;box-shadow:0 32px 80px rgba(0,0,0,.2);}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+.modal-head{background:var(--negro);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-head-title{font-family:var(--fd);font-size:20px;font-weight:800;color:#fff;}
+.modal-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.modal-close:hover{background:rgba(255,255,255,.2);}
+.modal-body{flex:1;overflow-y:auto;padding:22px;}
+
+/* ADMIN */
+.a-tabs{display:flex;border-bottom:1.5px solid var(--fondo2);margin-bottom:20px;overflow-x:auto;}
+.a-tabs::-webkit-scrollbar{display:none;}
+.a-tab{padding:9px 16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;color:var(--gris);cursor:pointer;font-family:var(--fb);border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:all .2s;white-space:nowrap;}
+.a-tab.active{color:var(--verde);border-bottom-color:var(--verde);}
+.a-sec{display:none;}
+.a-sec.active{display:block;}
+.af{margin-bottom:13px;}
+.af label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);margin-bottom:5px;}
+.af input,.af select,.af textarea{width:100%;padding:10px 13px;border:1.5px solid var(--gris2);border-radius:8px;font-size:13px;font-family:var(--fb);background:#fff;color:var(--negro);outline:none;transition:border-color .2s;}
+.af input:focus,.af select:focus,.af textarea:focus{border-color:var(--verde);}
+.af textarea{height:65px;resize:vertical;}
+.ar2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.img-prev{width:100%;height:110px;background:var(--fondo);border:2px dashed var(--gris2);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden;margin-bottom:6px;font-size:36px;color:var(--gris2);}
+.img-prev:hover{border-color:var(--verde);}
+.img-prev img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;}
+.ab{width:100%;background:var(--verde);color:#fff;border:none;border-radius:8px;padding:12px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:var(--fb);margin-top:6px;transition:background .2s;}
+.ab:hover{background:var(--verde2);}
+.ab.red{background:var(--rojo);}
+.ab.red:hover{background:#c04030;}
+.ilist{display:flex;flex-direction:column;gap:8px;}
+.irow{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--fondo2);border-radius:10px;transition:border-color .2s;}
+.irow:hover{border-color:var(--verde);}
+.irow-img{width:48px;height:48px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--fondo);}
+.irow-img img{width:100%;height:100%;object-fit:cover;}
+.irow-info{flex:1;}
+.irow-info strong{font-size:13px;font-weight:600;color:var(--negro);display:block;}
+.irow-info span{font-size:11px;color:var(--gris);}
+.rb{display:flex;gap:6px;}
+.be,.bd{padding:5px 11px;font-size:11px;font-weight:600;border-radius:16px;cursor:pointer;font-family:var(--fb);border:1.5px solid;background:transparent;}
+.be{color:var(--verde);border-color:var(--verde);}
+.be:hover{background:var(--verde);color:#fff;}
+.bd{color:var(--rojo);border-color:rgba(217,79,61,.3);}
+.bd:hover{background:var(--rojo);color:#fff;}
+.sg{margin-bottom:20px;}
+.sg-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--verde);margin-bottom:10px;padding-bottom:8px;border-bottom:1.5px solid var(--fondo2);}
+.sr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.sr>label:first-child{font-size:13px;color:var(--negro);}
+.sr input[type=text],.sr select{padding:7px 11px;border:1.5px solid var(--gris2);border-radius:8px;font-size:12px;font-family:var(--fb);background:#fff;outline:none;min-width:130px;}
+.sr input:focus,.sr select:focus{border-color:var(--verde);}
+.toggle{position:relative;width:42px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.tsl{position:absolute;inset:0;background:var(--gris2);cursor:pointer;border-radius:12px;transition:background .3s;}
+.tsl::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+.toggle input:checked+.tsl{background:var(--verde);}
+.toggle input:checked+.tsl::before{transform:translateX(18px);}
+.pw-wrap{text-align:center;padding:24px 0;}
+.pw-wrap h3{font-family:var(--fd);font-size:26px;font-weight:800;color:var(--negro);margin-bottom:6px;}
+.pw-wrap p{font-size:13px;color:var(--gris);margin-bottom:22px;}
+.pw-inp{width:100%;max-width:240px;padding:12px 16px;border:1.5px solid var(--gris2);border-radius:8px;font-size:18px;text-align:center;letter-spacing:.3em;font-family:var(--fb);outline:none;transition:border-color .2s;}
+.pw-inp:focus{border-color:var(--verde);}
+.pw-go{display:block;width:100%;max-width:240px;margin:12px auto 0;background:var(--verde);color:#fff;border:none;border-radius:8px;padding:13px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:var(--fb);transition:background .2s;}
+.pw-go:hover{background:var(--verde2);}
+.pw-err{color:var(--rojo);font-size:12px;margin-top:8px;min-height:18px;}
+
+/* CHECKOUT - PAGO */
+.pago-btn{
+  padding:14px;border:1.5px solid var(--gris2);border-radius:10px;background:#fff;
+  font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);color:var(--gris);
+  transition:all .15s;
+}
+.pago-btn.active{border-color:var(--verde);background:var(--verde-pale);color:var(--verde);}
+.pago-btn:hover{border-color:var(--verde);}
+
+/* TRACKING STEPS */
+.track-steps{display:flex;justify-content:space-between;align-items:flex-start;padding:0 6px;}
+.track-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;}
+.track-step::before{
+  content:'';position:absolute;top:7px;left:-50%;width:100%;height:2px;
+  background:var(--gris2);z-index:0;
+}
+.track-step:first-child::before{display:none;}
+.track-step.active::before,.track-step.done::before{background:var(--verde);}
+.ts-dot{
+  width:16px;height:16px;border-radius:50%;background:var(--gris2);
+  position:relative;z-index:1;border:3px solid var(--blanco);
+}
+.track-step.active .ts-dot,.track-step.done .ts-dot{background:var(--verde);}
+.ts-label{font-size:11px;color:var(--gris);text-align:center;}
+.track-step.active .ts-label,.track-step.done .ts-label{color:var(--verde);font-weight:700;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  nav,footer{padding-left:24px;padding-right:24px;}
+  .productos-sec,.servicios-sec{padding-left:24px;padding-right:24px;}
+  .hero-left{padding:60px 32px;}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:28px;}
+}
+@media(max-width:768px){
+  nav{height:58px;padding:0 16px;}
+  .nav-mid,.nav-search-wrap{display:none;}
+  .hamburger{display:flex;}
+  .mob-menu{top:58px;}
+  .cart-fab span:not(.cn){display:none;}
+  .cart-fab{padding:8px 12px;}
+  .hero{grid-template-columns:1fr;min-height:auto;}
+  .hero-left{padding:48px 20px;}
+  .hero-right{height:280px;}
+  .hero-stats{gap:16px;}
+  .productos-sec,.servicios-sec{padding:52px 16px;}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:20px;}
+  footer{padding:36px 16px 0;}
+  .cart-drawer{width:100vw;}
+  .modal-body{padding:16px;}
+  .ar2{grid-template-columns:1fr;}
+  .sr{flex-direction:column;align-items:flex-start;}
+  .sr input[type=text],.sr select{width:100%;min-width:unset;}
+}
+@media(max-width:480px){
+  .hero-title{font-size:clamp(44px,14vw,64px);}
+  .hero-btns{flex-direction:column;}
+  .btn-green,.btn-outline-w{text-align:center;}
+  .prod-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .pc-img{height:130px;}
+  .pc-body{padding:10px 10px 12px;}
+  .foot-grid{grid-template-columns:1fr;}
+  .serv-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#top">
+    <div class="nav-logo-leaf"><span>🥩</span></div>
+    <span class="nav-logo-text">Don <em>Chuy</em></span>
+  </a>
+  <div class="nav-mid">
+    <a href="#productos">Cortes</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#contacto">Contacto</a>
+    <a href="seguimiento.html">📍 Mi pedido</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-search-wrap">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar corte…" id="search-input" oninput="searchProds()">
+    </div>
+    <button class="cart-fab" onclick="openCart()">
+      🛒 <span>Mi orden</span>
+      <span class="cn" id="cart-num">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- MOB MENU -->
+<div class="mob-menu" id="mob-menu">
+  <a href="#productos" onclick="closeMob()">Cortes</a>
+  <a href="#servicios" onclick="closeMob()">Servicios</a>
+  <a href="#contacto" onclick="closeMob()">Contacto</a>
+  <a href="seguimiento.html" onclick="closeMob()">📍 Seguir mi pedido</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-left">
+    <div class="hero-pill"><span class="hero-pill-dot"></span><span>Abierto hoy · 7:00 – 20:00</span></div>
+    <h1 class="hero-title">
+      El corte<br>
+      <span class="accent">perfecto</span><br>
+      <span class="outline">a tu puerta.</span>
+    </h1>
+    <p class="hero-sub">Res, cerdo, pollo y más — cortes frescos del día seleccionados por nuestros carniceros. La carnicería de tu barrio, ahora en línea.</p>
+    <div class="hero-btns">
+      <a class="btn-green" href="#productos">Ver cortes</a>
+      <a class="btn-outline-w" href="#servicios">Nuestros servicios</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val">+80</div><div class="hstat-label">Cortes</div></div>
+      <div class="hstat"><div class="hstat-val">4.9★</div><div class="hstat-label">Calificación</div></div>
+      <div class="hstat"><div class="hstat-val">$299</div><div class="hstat-label">Envío gratis</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-mosaic">
+      <div class="hm-cell">
+        <img src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&q=80&auto=format&fit=crop" alt="Carne res">
+        <div class="hm-label">Res</div>
+      </div>
+      <div class="hm-cell">
+        <img src="https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=600&q=80&auto=format&fit=crop" alt="Pollo">
+        <div class="hm-label">Pollo</div>
+      </div>
+      <div class="hm-cell">
+        <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=600&q=80&auto=format&fit=crop" alt="Cerdo">
+        <div class="hm-label">Cerdo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA STRIP -->
+<div class="oferta-strip">
+  <p class="os-text">🔥 <strong>Oferta del día:</strong> 20% en toda la línea de pollo</p>
+  <span class="os-pill">Solo hoy</span>
+  <a class="os-btn" href="#productos" onclick="filterCat('pollo',null)">Ver ofertas →</a>
+</div>
+
+<!-- CATEGORÍAS -->
+<div class="cats-bar">
+  <div class="cats-row">
+    <a class="cat-btn active" href="#productos" onclick="filterCat('todo',this)"><span class="cat-icon">🥩</span>Todo</a>
+    <a class="cat-btn" href="#productos" onclick="filterCat('res',this)"><span class="cat-icon">🐄</span>Res</a>
+    <a class="cat-btn" href="#productos" onclick="filterCat('pollo',this)"><span class="cat-icon">🍗</span>Pollo</a>
+    <a class="cat-btn" href="#productos" onclick="filterCat('cerdo',this)"><span class="cat-icon">🐷</span>Cerdo</a>
+    <a class="cat-btn" href="#productos" onclick="filterCat('embutidos',this)"><span class="cat-icon">🌭</span>Embutidos</a>
+    <a class="cat-btn" href="#productos" onclick="filterCat('marinados',this)"><span class="cat-icon">🫙</span>Marinados</a>
+    <a class="cat-btn" href="#productos" onclick="filterCat('extras',this)"><span class="cat-icon">🧄</span>Extras</a>
+  </div>
+</div>
+
+<!-- PRODUCTOS -->
+<section class="productos-sec" id="productos">
+  <div class="prod-header">
+    <div class="ph-left">
+      <div class="ph-eyebrow">Nuestros cortes</div>
+      <div class="ph-title" id="prod-title">Todos los cortes</div>
+    </div>
+    <div class="ph-right">
+      <button class="pf active" onclick="sortProds('default',this)">Destacados</button>
+      <button class="pf" onclick="sortProds('price-asc',this)">Menor precio</button>
+      <button class="pf" onclick="sortProds('price-desc',this)">Mayor precio</button>
+      <button class="pf" onclick="sortProds('oferta',this)">Ofertas</button>
+    </div>
+  </div>
+  <div class="prod-grid" id="prod-grid"></div>
+  <p class="no-results" id="no-results" style="display:none">😕 No encontramos productos con ese término.</p>
+</section>
+
+<!-- SERVICIOS -->
+<section class="servicios-sec" id="servicios">
+  <div class="serv-eyebrow">Por qué elegirnos</div>
+  <div class="serv-title">Más que una carnicería.</div>
+  <div class="serv-grid">
+    <div class="serv-card"><div class="serv-icon">🚚</div><div class="serv-name">Envío a domicilio</div><div class="serv-desc">Entregamos en todo el municipio. Pedidos mayores a $299 con envío sin costo.</div></div>
+    <div class="serv-card"><div class="serv-icon">🔪</div><div class="serv-name">Corte a tu gusto</div><div class="serv-desc">Indica cómo quieres tu corte en las notas del pedido y lo preparamos como lo necesitas.</div></div>
+    <div class="serv-card"><div class="serv-icon">❄️</div><div class="serv-name">Siempre fresco</div><div class="serv-desc">Recibimos carne fresca diariamente. Lo que pediste hoy se corta hoy.</div></div>
+    <div class="serv-card"><div class="serv-icon">💳</div><div class="serv-name">Múltiples pagos</div><div class="serv-desc">Efectivo o tarjeta al momento de la entrega. Como prefieras.</div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contacto">
+  <div class="foot-grid">
+    <div>
+      <div class="foot-logo-wrap">
+        <div class="foot-leaf"><span>🥩</span></div>
+        <span class="foot-brand">Don <em>Chuy</em></span>
+      </div>
+      <p class="foot-desc">La carnicería de tu barrio con los mejores cortes frescos. Calidad y tradición desde 2010.</p>
+    </div>
+    <div class="foot-col"><h4>Tienda</h4><a href="#productos">Todos los cortes</a><a href="#productos">Ofertas del día</a><a href="seguimiento.html">Seguir mi pedido</a><a href="#servicios">Servicios</a><a href="#contacto">Contacto</a></div>
+    <div class="foot-col"><h4>Horario</h4><a href="#">Lun–Sáb: 7:00–20:00</a><a href="#">Domingo: 8:00–14:00</a><a href="#">Días festivos: 9:00–13:00</a></div>
+    <div class="foot-col"><h4>Contacto</h4><a class="wa-link" href="https://wa.me/" target="_blank">WhatsApp</a><a href="https://www.facebook.com" target="_blank">Facebook</a><a href="https://instagram.com" target="_blank">Instagram</a></div>
+  </div>
+  <div class="foot-bottom">
+    <p>© 2025 Carnicería Don Chuy. Todos los derechos reservados.</p>
+    <div class="foot-soc">
+      <a class="fsoc" href="https://www.facebook.com" target="_blank">fb</a>
+      <a class="fsoc" href="https://instagram.com" target="_blank">ig</a>
+      <a class="fsoc wa-link" href="https://wa.me/" target="_blank">wa</a>
+    </div>
+  </div>
+</footer>
+
+<!-- CARRITO -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <span class="cart-head-title">🛒 Mi Canasta</span>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty"><div class="cart-empty-icon">🧺</div><p>Tu canasta está vacía.<br>¡Agrega algo rico!</p></div>
+  </div>
+  <div id="cart-foot" style="display:none">
+    <div class="cart-foot">
+      <div class="cart-total-row"><span class="cart-total-label">Total</span><span class="cart-total-val" id="cart-total">$0</span></div>
+      <button class="cart-btn-checkout" onclick="abrirCheckout()">Finalizar pedido →</button>
+      <button class="cart-btn-cont" onclick="closeCart()">Seguir comprando</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkout-overlay" onclick="if(event.target===this)cerrarCheckout()">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-head">
+      <span class="modal-head-title">📦 Datos de entrega</span>
+      <button class="modal-close" onclick="cerrarCheckout()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="af"><label>Nombre completo</label><input type="text" id="co-nombre" placeholder="¿A nombre de quién es el pedido?"></div>
+      <div class="af"><label>Teléfono</label><input type="tel" id="co-telefono" placeholder="10 dígitos"></div>
+
+      <div class="sg-title" style="margin-top:18px">Dirección de entrega</div>
+      <div class="af"><label>Calle</label><input type="text" id="co-calle" placeholder="Nombre de la calle"></div>
+      <div class="af"><label>Condominio / Colonia (si aplica)</label><input type="text" id="co-condominio" placeholder="Opcional"></div>
+      <div class="ar2">
+        <div class="af"><label>Número exterior</label><input type="text" id="co-numext" placeholder="123"></div>
+        <div class="af"><label>Número interior (si aplica)</label><input type="text" id="co-numint" placeholder="Opcional"></div>
+      </div>
+      <div class="af"><label>Descripción / referencia</label><textarea id="co-referencia" placeholder="Ej: casa azul, portón negro, frente a la tienda..." style="height:60px"></textarea></div>
+
+      <div class="sg-title" style="margin-top:18px">Método de pago</div>
+      <div class="ar2">
+        <button type="button" class="pago-btn active" id="pago-efectivo-btn" onclick="seleccionarPago('efectivo')">💵 Efectivo</button>
+        <button type="button" class="pago-btn" id="pago-tarjeta-btn" onclick="seleccionarPago('tarjeta')">💳 Tarjeta</button>
+      </div>
+
+      <div id="pago-efectivo-campos">
+        <div class="af" style="margin-top:12px"><label>¿Con qué billete pagarás?</label>
+          <select id="co-billete">
+            <option value="exacto">Pago exacto</option>
+            <option value="100">Billete de $100</option>
+            <option value="200">Billete de $200</option>
+            <option value="500">Billete de $500</option>
+            <option value="1000">Billete de $1000</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="pago-tarjeta-campos" style="display:none">
+        <div class="af" style="margin-top:12px"><label>Tipo de tarjeta</label>
+          <select id="co-tipo-tarjeta">
+            <option value="debito">Débito</option>
+            <option value="credito">Crédito</option>
+          </select>
+        </div>
+        <p style="font-size:12px;color:var(--gris);margin-top:6px">El cobro se realiza de forma manual al momento de la entrega.</p>
+      </div>
+
+      <button class="ab" style="margin-top:20px" onclick="confirmarPedido()">Confirmar pedido →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEGUIMIENTO MODAL -->
+<div class="modal-overlay" id="track-overlay" onclick="if(event.target===this)cerrarTracking()">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-head">
+      <span class="modal-head-title">📍 Tu pedido</span>
+      <button class="modal-close" onclick="cerrarTracking()">✕</button>
+    </div>
+    <div class="modal-body" id="track-body" style="text-align:center;padding:30px 22px">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <div style="font-family:var(--fd);font-size:22px;font-weight:800;margin-bottom:6px" id="track-num"></div>
+      <div style="font-size:13px;color:var(--gris);margin-bottom:8px">Guarda este número para dar seguimiento a tu pedido</div>
+      <!-- Botón para que el cliente se mande su número de pedido por WhatsApp -->
+      <a id="track-wa-guardar" href="#" target="_blank" rel="noopener"
+        style="display:inline-block;background:#25d366;color:#fff;text-decoration:none;font-size:12px;font-weight:700;padding:8px 18px;border-radius:20px;margin-bottom:20px">
+        💬 Guardar número en WhatsApp
+      </a>
+      <div class="track-steps">
+        <div class="track-step active" id="step-nuevo"><div class="ts-dot"></div><div class="ts-label">Pendiente</div></div>
+        <div class="track-step" id="step-preparando"><div class="ts-dot"></div><div class="ts-label">Preparando</div></div>
+        <div class="track-step" id="step-camino"><div class="ts-dot"></div><div class="ts-label">En camino</div></div>
+        <div class="track-step" id="step-entregado"><div class="ts-dot"></div><div class="ts-label">Entregado</div></div>
+      </div>
+      <a href="seguimiento.html" class="ab" style="margin-top:24px;display:block;text-align:center;text-decoration:none">📍 Ver seguimiento de mi pedido</a>
+      <div id="track-wa-msg" style="font-size:12.5px;color:var(--gris);margin-top:16px;line-height:1.5;display:none">
+        Para cualquier percance, contáctanos por <a id="track-wa-link" href="#" target="_blank" rel="noopener" style="color:var(--verde);font-weight:700;text-decoration:none">WhatsApp</a> 💬
+      </div>
+      <button class="cart-btn-cont" style="margin-top:10px" onclick="cerrarTracking()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   CONEXIÓN A SUPABASE (BASE DE DATOS REAL)
+   ══════════════════════════════════════ */
+const SUPABASE_URL = 'https://mnieoqxfezvmkvbpaouk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Tt3CVL8FTfmDPMgCLKL8_Q_0HcHR0Dz';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ⬇️ WhatsApp de la tienda (con 52 al inicio, sin espacios ni guiones). Ej: '5213312345678'
+// Déjalo '' (vacío) si todavía no lo tienes; el mensaje de contacto se mostrará solo cuando lo llenes.
+const WHATSAPP_TIENDA = '523315268181';
+
+/* CATALOG ahora se llena desde Supabase, no de una lista fija */
+let catalog=[];
+let cart={},activeFilter='todo',activeSort='default',searchTerm='',nextId=100;
+
+/* Carga los productos reales desde la tabla "productos" en Supabase */
+async function cargarProductosDesdeSupabase(){
+  const { data, error } = await sb.from('productos').select('*').order('id');
+  if(error){
+    console.error('Error cargando productos:', error);
+    showToast('⚠️ No se pudieron cargar los productos');
+    return;
+  }
+  // Convertimos los nombres de columna de la base de datos a los nombres que usa el resto del código
+  catalog = data.map(p => ({
+    id: p.id,
+    cat: p.categoria,
+    name: p.nombre,
+    unit: p.unidad,
+    price: p.precio,
+    stock: p.stock,
+    badge: p.badge || '',
+    img: p.imagen_url
+  }));
+  renderProds();
+}
+
+function getBadgeHTML(b){
+  if(!b)return '';
+  const m={oferta:'badge-oferta',nuevo:'badge-nuevo',popular:'badge-popular'};
+  const l={oferta:'🔥 Oferta',nuevo:'✨ Nuevo',popular:'⭐ Popular'};
+  return `<div class="pc-badge ${m[b]}">${l[b]}</div>`;
+}
+
+function renderProds(){
+  let list=[...catalog];
+  if(activeFilter!=='todo')list=list.filter(p=>p.cat===activeFilter);
+  if(searchTerm)list=list.filter(p=>p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  if(activeSort==='price-asc')list.sort((a,b)=>a.price-b.price);
+  else if(activeSort==='price-desc')list.sort((a,b)=>b.price-a.price);
+  else if(activeSort==='oferta')list=[...list.filter(p=>p.badge==='oferta'),...list.filter(p=>p.badge!=='oferta')];
+  const grid=document.getElementById('prod-grid'),nr=document.getElementById('no-results');
+  grid.innerHTML='';
+  if(!list.length){nr.style.display='block';return;}
+  nr.style.display='none';
+  list.forEach(p=>{
+    const oldp=p.oldPrice?`<span class="pc-price-old">$${p.oldPrice}</span>`:'';
+    const agotado = p.stock <= 0;
+    const div=document.createElement('div');
+    div.className='prod-card' + (agotado ? ' agotado' : '');
+    div.innerHTML=`
+      <div class="pc-img">
+        ${getBadgeHTML(p.badge)}
+        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        ${agotado
+          ? `<div class="pc-agotado-banner">Agotado</div>`
+          : `<button class="pc-add-btn" onclick="addToCart(${p.id});event.stopPropagation()">+</button>`
+        }
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">${p.cat}</div>
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-unit">Por ${p.unit}</div>
+        <div class="pc-footer">
+          <div><span class="pc-price">$${p.price}</span>${oldp}</div>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function filterCat(cat,el){
+  activeFilter=cat;
+  document.querySelectorAll('.cat-btn').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const titles={todo:'Todos los cortes',res:'Cortes de res',pollo:'Pollo fresco',cerdo:'Cortes de cerdo',embutidos:'Embutidos',marinados:'Marinados',extras:'Extras y complementos'};
+  document.getElementById('prod-title').textContent=titles[cat]||'Productos';
+  renderProds();
+  document.getElementById('productos').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function sortProds(type,btn){
+  activeSort=type;
+  document.querySelectorAll('.pf').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProds();
+}
+
+function searchProds(){
+  searchTerm=document.getElementById('search-input').value;
+  renderProds();
+}
+
+function addToCart(id){
+  const p=catalog.find(x=>x.id===id);if(!p)return;
+  if(!cart[id]) cart[id]={product:p,qty:0};
+  if(cart[id].qty >= p.stock){
+    showToast(`🚫 Solo hay ${p.stock} disponibles de "${p.name}"`);
+    return;
+  }
+  cart[id].qty++;
+  updateCart();
+  showToast(`🛒 ${p.name} agregado`);
+}
+
+function changeQty(id,d){
+  if(!cart[id])return;
+  const p=cart[id].product;
+  if(d>0 && cart[id].qty>=p.stock){
+    showToast(`🚫 Solo hay ${p.stock} disponibles de "${p.name}"`);
+    return;
+  }
+  cart[id].qty+=d;
+  if(cart[id].qty<=0)delete cart[id];
+  updateCart();
+}
+function removeItem(id){delete cart[id];updateCart();}
+
+function updateCart(){
+  const keys=Object.keys(cart);
+  const totalQty=keys.reduce((s,k)=>s+cart[k].qty,0);
+  document.getElementById('cart-num').textContent=totalQty;
+  const cont=document.getElementById('cart-items'),foot=document.getElementById('cart-foot');
+  if(!keys.length){cont.innerHTML='<div class="cart-empty"><div class="cart-empty-icon">🧺</div><p>Tu canasta está vacía.<br>¡Agrega algo rico!</p></div>';foot.style.display='none';return;}
+  let total=0;cont.innerHTML='';
+  keys.forEach(k=>{
+    const{product:p,qty}=cart[k];total+=p.price*qty;
+    const div=document.createElement('div');div.className='ci';
+    div.innerHTML=`
+      <div class="ci-img"><img src="${p.img}" alt="${p.name}"></div>
+      <div class="ci-info">
+        <div class="ci-name">${p.name}</div>
+        <div class="ci-unit">Por ${p.unit}</div>
+        <div class="ci-ctrl">
+          <div class="ci-qty"><button onclick="changeQty(${p.id},-1)">−</button><span>${qty}</span><button onclick="changeQty(${p.id},1)">+</button></div>
+          <span class="ci-price">$${(p.price*qty).toLocaleString()}</span>
+          <button class="ci-rm" onclick="removeItem(${p.id})">✕</button>
+        </div>
+      </div>`;
+    cont.appendChild(div);
+  });
+  document.getElementById('cart-total').textContent='$'+total.toLocaleString();
+  foot.style.display='block';
+}
+
+function openCart(){document.getElementById('cart-drawer').classList.add('open');document.getElementById('cart-overlay').classList.add('open');}
+
+/* ── CHECKOUT MODAL ── */
+let metodoPagoSeleccionado = 'efectivo';
+
+function abrirCheckout(){
+  const keys=Object.keys(cart);
+  if(!keys.length){ showToast('🥩 Tu orden está vacía'); return; }
+  closeCart();
+  document.getElementById('checkout-overlay').classList.add('open');
+}
+function cerrarCheckout(){document.getElementById('checkout-overlay').classList.remove('open');}
+
+function seleccionarPago(metodo){
+  metodoPagoSeleccionado = metodo;
+  document.getElementById('pago-efectivo-btn').classList.toggle('active', metodo==='efectivo');
+  document.getElementById('pago-tarjeta-btn').classList.toggle('active', metodo==='tarjeta');
+  document.getElementById('pago-efectivo-campos').style.display = metodo==='efectivo' ? 'block' : 'none';
+  document.getElementById('pago-tarjeta-campos').style.display = metodo==='tarjeta' ? 'block' : 'none';
+}
+
+/* Guarda el pedido real en la tabla "pedidos" de Supabase y resta el stock */
+async function confirmarPedido(){
+  const keys=Object.keys(cart);
+  if(!keys.length){ showToast('🥩 Tu orden está vacía'); return; }
+
+  const nombre = document.getElementById('co-nombre').value.trim();
+  const telefono = document.getElementById('co-telefono').value.trim();
+  const calle = document.getElementById('co-calle').value.trim();
+  const numext = document.getElementById('co-numext').value.trim();
+
+  if(!nombre || !telefono || !calle || !numext){
+    showToast('⚠️ Completa nombre, teléfono, calle y número exterior');
+    return;
+  }
+
+  const condominio = document.getElementById('co-condominio').value.trim();
+  const numint = document.getElementById('co-numint').value.trim();
+  const referencia = document.getElementById('co-referencia').value.trim();
+
+  const direccionCompleta = {
+    calle, numero_exterior: numext, numero_interior: numint || null,
+    condominio: condominio || null, referencia: referencia || null
+  };
+
+  let datosPago = { metodo: metodoPagoSeleccionado };
+  if(metodoPagoSeleccionado === 'efectivo'){
+    datosPago.billete = document.getElementById('co-billete').value;
+  } else {
+    datosPago.tipo_tarjeta = document.getElementById('co-tipo-tarjeta').value;
+  }
+
+  // Verificamos que haya suficiente stock de cada producto antes de confirmar
+  for(const k of keys){
+    const {product:p, qty} = cart[k];
+    const { data: actual, error: errStock } = await sb.from('productos').select('stock').eq('id', p.id).single();
+    if(errStock || !actual){
+      showToast('⚠️ No se pudo verificar el stock, intenta de nuevo');
+      return;
+    }
+    if(actual.stock < qty){
+      showToast(`⚠️ Solo quedan ${actual.stock} de "${p.name}"`);
+      return;
+    }
+  }
+
+  let total = 0;
+  const productosPedido = keys.map(k=>{
+    const {product:p, qty} = cart[k];
+    total += p.price*qty;
+    return { id: p.id, nombre: p.name, cantidad: qty, precio_unitario: p.price };
+  });
+
+  const { data: pedidoCreado, error } = await sb.from('pedidos').insert({
+    cliente_nombre: nombre,
+    cliente_telefono: telefono,
+    direccion: direccionCompleta,
+    metodo_pago: datosPago,
+    productos: productosPedido,
+    total: total,
+    estado: 'nuevo'
+  }).select().single();
+
+  if(error){
+    showToast('⚠️ No se pudo enviar el pedido, intenta de nuevo');
+    console.error(error);
+    return;
+  }
+
+  // Descontamos el stock usando la función atómica de Supabase
+  // Esto evita que dos pedidos simultáneos descuenten más de lo que hay
+  for(const k of keys){
+    const {product:p, qty} = cart[k];
+    const { data: ok } = await sb.rpc('descontar_stock', { pid: p.id, cantidad: qty });
+    if(!ok){
+      // Si la función devuelve false, el stock se agotó justo entre que el cliente hizo clic y llegó el pedido
+      showToast(`⚠️ "${p.name}" se agotó justo ahora. Tu pedido fue registrado — la tienda te contactará.`);
+    }
+  }
+
+  cart = {};
+  updateCart();
+  cerrarCheckout();
+  closeCart();
+  await cargarProductosDesdeSupabase(); // refrescamos el catálogo con el stock actualizado
+
+  // Mostramos el seguimiento del pedido con su número
+  mostrarTracking(pedidoCreado.id);
+}
+
+/* ── SEGUIMIENTO DEL PEDIDO ── */
+function mostrarTracking(idPedido){
+  document.getElementById('track-num').textContent = `Pedido #${idPedido}`;
+  localStorage.setItem('ultimoPedidoId', idPedido);
+
+  // Botón "Guardar número en WhatsApp" — el cliente se manda el número a sí mismo
+  // Abre WhatsApp con un mensaje prellenado; el cliente solo elige a quién mandarlo (puede ser a sí mismo)
+  const msgCliente = encodeURIComponent(`Mi número de pedido en Don Chuy es el #${idPedido}. Lo puedo consultar en: https://novasitedigital.github.io/carniceria/seguimiento.html`);
+  document.getElementById('track-wa-guardar').href = `https://wa.me/?text=${msgCliente}`;
+
+  // Mensaje de contacto por WhatsApp con la tienda
+  if(WHATSAPP_TIENDA){
+    const msg = encodeURIComponent(`Hola, tengo una duda sobre mi pedido #${idPedido} de Don Chuy.`);
+    document.getElementById('track-wa-link').href = `https://wa.me/${WHATSAPP_TIENDA}?text=${msg}`;
+    document.getElementById('track-wa-msg').style.display = 'block';
+  }
+  document.getElementById('track-overlay').classList.add('open');
+}
+function cerrarTracking(){document.getElementById('track-overlay').classList.remove('open');}
+
+/* Permite consultar el estado actual de un pedido por su número */
+async function consultarPedido(idPedido){
+  const { data, error } = await sb.from('pedidos').select('estado').eq('id', idPedido).single();
+  if(error || !data) return null;
+  return data.estado;
+}
+
+function closeCart(){document.getElementById('cart-drawer').classList.remove('open');document.getElementById('cart-overlay').classList.remove('open');}
+function toggleMenu(){const h=document.getElementById('hamburger'),m=document.getElementById('mob-menu');h.classList.toggle('open');m.classList.toggle('open');}
+function closeMob(){document.getElementById('hamburger').classList.remove('open');document.getElementById('mob-menu').classList.remove('open');}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* Aplica el WhatsApp de la tienda a los enlaces del footer (solo si está configurado arriba) */
+function aplicarWhatsAppFooter(){
+  if(!WHATSAPP_TIENDA) return;
+  const msg = encodeURIComponent('Hola, les escribo desde su carnicería en línea Don Chuy.');
+  document.querySelectorAll('.wa-link').forEach(a=>{ a.href = `https://wa.me/${WHATSAPP_TIENDA}?text=${msg}`; });
+}
+aplicarWhatsAppFooter();
+
+/* Al cargar la página, traemos los productos reales de Supabase */
+cargarProductosDesdeSupabase();
+</script>
+</body>
+</html>
