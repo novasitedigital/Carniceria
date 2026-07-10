@@ -702,25 +702,25 @@ const WHATSAPP_TIENDA = '523315268181';
 let catalog=[];
 let cart={},activeFilter='todo',activeSort='default',searchTerm='',nextId=100;
 
-/* Carga los productos reales desde la tabla "productos" en Supabase */
+/* ═══ MODO DEMO ═══
+   Esta versión usa productos de ejemplo hardcodeados para mostrar el diseño.
+   Para conectarla a un cliente real: crear proyecto en Supabase, correr el SQL
+   del checklist de onboarding y restaurar la función original de carga. */
 async function cargarProductosDesdeSupabase(){
-  const { data, error } = await sb.from('productos').select('*').order('id');
-  if(error){
-    console.error('Error cargando productos:', error);
-    showToast('⚠️ No se pudieron cargar los productos');
-    return;
-  }
-  // Convertimos los nombres de columna de la base de datos a los nombres que usa el resto del código
-  catalog = data.map(p => ({
-    id: p.id,
-    cat: p.categoria,
-    name: p.nombre,
-    unit: p.unidad,
-    price: p.precio,
-    stock: p.stock,
-    badge: p.badge || '',
-    img: p.imagen_url
-  }));
+  catalog = [
+    { id:1,  cat:'res',       name:'Arrachera Marinada',   unit:'kg',   price:280, stock:50, badge:'popular', img:'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=600&q=80&auto=format&fit=crop' },
+    { id:2,  cat:'res',       name:'Rib Eye',              unit:'kg',   price:420, stock:30, badge:'nuevo',   img:'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&q=80&auto=format&fit=crop' },
+    { id:3,  cat:'res',       name:'Molida Especial',      unit:'kg',   price:160, stock:80, badge:'',        img:'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=600&q=80&auto=format&fit=crop' },
+    { id:4,  cat:'res',       name:'Bistec de Res',        unit:'kg',   price:190, stock:60, badge:'',        img:'https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?w=600&q=80&auto=format&fit=crop' },
+    { id:5,  cat:'pollo',     name:'Pechuga de Pollo',     unit:'kg',   price:135, stock:70, badge:'oferta',  img:'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=600&q=80&auto=format&fit=crop' },
+    { id:6,  cat:'pollo',     name:'Pierna y Muslo',       unit:'kg',   price:95,  stock:65, badge:'',        img:'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&q=80&auto=format&fit=crop' },
+    { id:7,  cat:'pollo',     name:'Alitas Marinadas',     unit:'kg',   price:120, stock:45, badge:'popular', img:'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&q=80&auto=format&fit=crop' },
+    { id:8,  cat:'cerdo',     name:'Costilla de Cerdo',    unit:'kg',   price:145, stock:55, badge:'',        img:'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=600&q=80&auto=format&fit=crop' },
+    { id:9,  cat:'cerdo',     name:'Chuleta Ahumada',      unit:'kg',   price:130, stock:40, badge:'oferta',  img:'https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=600&q=80&auto=format&fit=crop' },
+    { id:10, cat:'embutidos', name:'Chorizo Artesanal',    unit:'kg',   price:110, stock:35, badge:'popular', img:'https://images.unsplash.com/photo-1583224964978-2257b960c3d3?w=600&q=80&auto=format&fit=crop' },
+    { id:11, cat:'embutidos', name:'Tocino Ahumado',       unit:'250g', price:65,  stock:50, badge:'',        img:'https://images.unsplash.com/photo-1528607929212-2636ec44253e?w=600&q=80&auto=format&fit=crop' },
+    { id:12, cat:'marinados', name:'Fajitas al Pastor',    unit:'kg',   price:155, stock:42, badge:'nuevo',   img:'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600&q=80&auto=format&fit=crop' },
+  ];
   renderProds();
 }
 
@@ -894,62 +894,20 @@ async function confirmarPedido(){
     datosPago.tipo_tarjeta = document.getElementById('co-tipo-tarjeta').value;
   }
 
-  // Verificamos que haya suficiente stock de cada producto antes de confirmar
-  for(const k of keys){
-    const {product:p, qty} = cart[k];
-    const { data: actual, error: errStock } = await sb.from('productos').select('stock').eq('id', p.id).single();
-    if(errStock || !actual){
-      showToast('⚠️ No se pudo verificar el stock, intenta de nuevo');
-      return;
-    }
-    if(actual.stock < qty){
-      showToast(`⚠️ Solo quedan ${actual.stock} de "${p.name}"`);
-      return;
-    }
-  }
-
+  // ═══ MODO DEMO ═══
+  // En la versión demo no se guarda en Supabase. Se simula un pedido exitoso.
   let total = 0;
-  const productosPedido = keys.map(k=>{
-    const {product:p, qty} = cart[k];
-    total += p.price*qty;
-    return { id: p.id, nombre: p.name, cantidad: qty, precio_unitario: p.price };
-  });
-
-  const { data: pedidoCreado, error } = await sb.from('pedidos').insert({
-    cliente_nombre: nombre,
-    cliente_telefono: telefono,
-    direccion: direccionCompleta,
-    metodo_pago: datosPago,
-    productos: productosPedido,
-    total: total,
-    estado: 'nuevo'
-  }).select().single();
-
-  if(error){
-    showToast('⚠️ No se pudo enviar el pedido, intenta de nuevo');
-    console.error(error);
-    return;
-  }
-
-  // Descontamos el stock usando la función atómica de Supabase
-  // Esto evita que dos pedidos simultáneos descuenten más de lo que hay
-  for(const k of keys){
-    const {product:p, qty} = cart[k];
-    const { data: ok } = await sb.rpc('descontar_stock', { pid: p.id, cantidad: qty });
-    if(!ok){
-      // Si la función devuelve false, el stock se agotó justo entre que el cliente hizo clic y llegó el pedido
-      showToast(`⚠️ "${p.name}" se agotó justo ahora. Tu pedido fue registrado — la tienda te contactará.`);
-    }
-  }
+  keys.forEach(k=>{ const {product:p, qty} = cart[k]; total += p.price*qty; });
 
   cart = {};
   updateCart();
   cerrarCheckout();
   closeCart();
-  await cargarProductosDesdeSupabase(); // refrescamos el catálogo con el stock actualizado
+  renderProds();
 
-  // Mostramos el seguimiento del pedido con su número
-  mostrarTracking(pedidoCreado.id);
+  // Número de pedido simulado para la demo
+  const numeroDemo = Math.floor(Math.random()*90)+10;
+  mostrarTracking(numeroDemo);
 }
 
 /* ── SEGUIMIENTO DEL PEDIDO ── */
